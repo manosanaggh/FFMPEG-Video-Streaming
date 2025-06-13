@@ -155,7 +155,6 @@ public class StreamingClient
 				}
 				case "360p":{
 					commandLineArgs.add("udp://127.0.0.1:6000");
-					System.out.println("Play UDP");
 					break;
 				}
 				case "480p":{
@@ -179,9 +178,19 @@ public class StreamingClient
 				default: break;
 		}
 		
-		ProcessBuilder processBuilder = new ProcessBuilder(commandLineArgs);
-		processBuilder.start();
-		
+		// Run ffplay in a separate thread
+		Thread ffplayThread = new Thread(() -> {
+			try {
+				ProcessBuilder processBuilder = new ProcessBuilder(commandLineArgs);
+				processBuilder.inheritIO();  
+				Process ffplayProcess = processBuilder.start();
+				ffplayProcess.waitFor();  // Wait until ffplay exits
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		ffplayThread.start();
+
 		log.debug("Process to play the incoming stream started");
 	}
 	

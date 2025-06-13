@@ -306,7 +306,7 @@ public class StreamingServer implements Runnable
 				commandLineArgs.add("mpegts");
 				commandLineArgs.add("tcp://127.0.0.1:5100");
 			}
-			else
+			else if(selectedProtocol.equals("RTP/UDP"))	
 			{
 				commandLineArgs.add("-re");
 				commandLineArgs.add("-i");
@@ -320,16 +320,74 @@ public class StreamingServer implements Runnable
 				commandLineArgs.add("-sdp_file");
 				commandLineArgs.add(System.getProperty("user.dir") + "/video.sdp");
 			}
-			
+			else
+				switch(selectedVideo.split("[-.]")[1]){
+					case "240p":{
+						commandLineArgs.add("-re");
+						commandLineArgs.add("-i");
+						commandLineArgs.add(videosDirFullpath + "/" + selectedVideo);
+						commandLineArgs.add("-f");
+						commandLineArgs.add("mpegts");
+						commandLineArgs.add("tcp://127.0.0.1:5100");
+						break;
+					}
+					case "360p":{
+						commandLineArgs.add("-re");
+						commandLineArgs.add("-i");
+						commandLineArgs.add(videosDirFullpath + "/" + selectedVideo);
+						commandLineArgs.add("-f");
+						commandLineArgs.add("mpegts");
+						commandLineArgs.add("udp://127.0.0.1:6000");
+						break;
+					}
+					case "480p":{
+						commandLineArgs.add("-re");
+						commandLineArgs.add("-i");
+						commandLineArgs.add(videosDirFullpath + "/" + selectedVideo);
+						commandLineArgs.add("-f");
+						commandLineArgs.add("mpegts");
+						commandLineArgs.add("udp://127.0.0.1:6000");
+						break;
+					}
+					case "720p":{
+						commandLineArgs.add("-re");
+						commandLineArgs.add("-i");
+						commandLineArgs.add(videosDirFullpath + "/" + selectedVideo);
+						commandLineArgs.add("-an");
+						commandLineArgs.add("-c:v");
+						commandLineArgs.add("libx264");
+						commandLineArgs.add("-f");
+						commandLineArgs.add("rtp");
+						commandLineArgs.add("rtp://127.0.0.1:5004");
+						commandLineArgs.add("-sdp_file");
+						commandLineArgs.add(System.getProperty("user.dir") + "/video.sdp");
+						break;
+					}
+					case "1080p":{
+						commandLineArgs.add("-re");
+						commandLineArgs.add("-i");
+						commandLineArgs.add(videosDirFullpath + "/" + selectedVideo);
+						commandLineArgs.add("-an");
+						commandLineArgs.add("-c:v");
+						commandLineArgs.add("libx264");
+						commandLineArgs.add("-f");
+						commandLineArgs.add("rtp");
+						commandLineArgs.add("rtp://127.0.0.1:5004");
+						commandLineArgs.add("-sdp_file");
+						commandLineArgs.add(System.getProperty("user.dir") + "/video.sdp");
+						break;
+					}
+					default: break;
+			}
+
 			try{
-				Thread.sleep(3000);
+				Thread.sleep(500);
 			}catch (InterruptedException e){
 				e.printStackTrace();
 			}
 
 			ProcessBuilder process_builder = new ProcessBuilder(commandLineArgs);
 			process_builder.start();
-			
 			outputStream.close();
 			inputStream.close();
 			socket.close();
